@@ -62,6 +62,7 @@ contents.each do |row|
   id = row[0]
   name = row[:first_name]
   homephone = row[:homephone]
+  regdate = row[:regdate]
 
   phonenumber = clean_phone_number(homephone)
 
@@ -70,5 +71,5 @@ contents.each do |row|
 
   # form_letter = erb_template.result(binding)
   # save_thank_you_letter(id, form_letter)
-  puts "#{id} #{name} #{phonenumber}"
+  puts "#{id} #{name} #{phonenumber} #{regdate}"
 end
