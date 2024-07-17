@@ -25,6 +25,11 @@ def clean_phone_number(number)
   end
 end
 
+def peak_time_reg(regtime)
+  hour, minute = regtime.split(':')
+  hour
+end
+
 def legislators_by_zipcode(zipcode)
   civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
   civic_info.key = 'AIzaSyClRzDqDh5MsXwnCWi0kOiiBivP6JsSyBw'
@@ -38,6 +43,8 @@ def legislators_by_zipcode(zipcode)
      'You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials'
   end
 end
+
+
 
 def save_thank_you_letter(id, form_letter)
   Dir.mkdir('output') unless Dir.exist?('output')
@@ -58,18 +65,30 @@ contents = CSV.open(
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 
+
+temp = []
+
 contents.each do |row|
   id = row[0]
   name = row[:first_name]
   homephone = row[:homephone]
-  regdate = row[:regdate]
+  regtime = row[:regdate]
 
   phonenumber = clean_phone_number(homephone)
+  regtime = regtime.split(' ')[1]
+  peaktime = peak_time_reg(regtime)
+  temp << peaktime
 
   # zipcode = clean_zipcode(row[:zipcode])
   # legislators = legislators_by_zipcode(zipcode)
 
   # form_letter = erb_template.result(binding)
   # save_thank_you_letter(id, form_letter)
-  puts "#{id} #{name} #{phonenumber} #{regdate}"
+  #puts "#{id} #{name} #{phonenumber} #{regtime}"
 end
+
+temp = temp.map(&:to_i)
+freq = temp.inject(Hash.new(0)) {|h,v| h[v]+= 1; h}
+max = freq.values.max
+most_registred_hours = Hash[freq.select { |k, v| v == max} ]
+puts "Most registered hours are #{most_registred_hours.keys.join(', ')}"
